@@ -19,17 +19,14 @@ public class InventarioController {
     @Autowired
     private InventarioRepository inventarioRepository;
 
-   @Autowired
-private RestTemplate restTemplate;
+    @Autowired
+    private RestTemplate restTemplate;
 
-
-    // Endpoint de verificación rápida
     @GetMapping("/ping")
     public Map<String, Object> ping() {
         return Map.of("message", "Microservicio Inventario activo");
     }
 
-    // Crear inventario
     @PostMapping
     public ResponseEntity<Map<String, Object>> crearInventario(@RequestBody Inventario inventario) {
         Inventario saved = inventarioRepository.save(inventario);
@@ -48,7 +45,6 @@ private RestTemplate restTemplate;
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
-    // Listar inventario completo
     @GetMapping
     public ResponseEntity<Map<String, Object>> listarInventario() {
         List<Inventario> inventarios = inventarioRepository.findAll();
@@ -69,15 +65,14 @@ private RestTemplate restTemplate;
         return ResponseEntity.ok(response);
     }
 
-    // Consultar cantidad disponible de un producto específico
+    @SuppressWarnings("unchecked")
     @GetMapping("/producto/{productoId}")
     public ResponseEntity<Map<String, Object>> consultarCantidad(@PathVariable Long productoId) {
         Inventario inventario = inventarioRepository.findByProductoId(productoId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventario no encontrado"));
 
-        // Obtener información del producto desde microservicio Productos con API Key
         String url = "http://localhost:8080/productos/" + productoId;
-        Map producto;
+        Map<String, Object> producto;
         try {
             producto = restTemplate.getForObject(url, Map.class);
         } catch (ResourceAccessException e) {
@@ -100,31 +95,7 @@ private RestTemplate restTemplate;
         return ResponseEntity.ok(response);
     }
 
-    // Actualizar cantidad disponible de un producto
-    @PutMapping("/{productoId}")
-    public ResponseEntity<Map<String, Object>> actualizarCantidad(@PathVariable Long productoId,
-                                                                  @RequestParam Integer cantidad) {
-        Inventario inventario = inventarioRepository.findByProductoId(productoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Inventario no encontrado"));
-
-        inventario.setCantidad(cantidad);
-        Inventario updated = inventarioRepository.save(inventario);
-
-        Map<String, Object> response = Map.of(
-            "data", Map.of(
-                "type", "inventario",
-                "id", updated.getId(),
-                "attributes", Map.of(
-                    "productoId", updated.getProductoId(),
-                    "cantidad", updated.getCantidad()
-                )
-            )
-        );
-
-        return ResponseEntity.ok(response);
-    }
-
-    // Registrar compra
+    @SuppressWarnings("unchecked")
     @PostMapping("/compra")
     public ResponseEntity<Map<String, Object>> registrarCompra(@RequestParam Long productoId,
                                                                @RequestParam Integer cantidad) {
@@ -138,9 +109,8 @@ private RestTemplate restTemplate;
         inventario.setCantidad(inventario.getCantidad() - cantidad);
         inventarioRepository.save(inventario);
 
-        // Obtener información del producto desde microservicio Productos con API Key
         String url = "http://localhost:8080/productos/" + productoId;
-        Map producto;
+        Map<String, Object> producto;
         try {
             producto = restTemplate.getForObject(url, Map.class);
         } catch (ResourceAccessException e) {
@@ -163,6 +133,8 @@ private RestTemplate restTemplate;
         return ResponseEntity.ok(response);
     }
 }
+
+
 
 
 
