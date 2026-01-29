@@ -158,3 +158,143 @@ ProductosControllerTest valida endpoints de productos.
 Después de ejecutar mvn verify, se generan reportes de Jacoco:
 
 micro_productos/target/site/jacoco/index.html
+
+7. flujo y entorno de variables en postman 
+
+aqui se puede probar todo el proyecto sin tener que configurar manualmente
+
+
+//flujo
+// nombre del archivo para crear y importar en el postman ---> microservicios.postman_collection.json
+
+//codigo
+{
+  "info": {
+    "name": "Microservicios Inventario y Productos",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Productos",
+      "item": [
+        {
+          "name": "Crear Producto",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-KEY", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrlProductos}}/productos",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"nombre\": \"Laptop\", \"precio\": 3500.0 }"
+            }
+          }
+        },
+        {
+          "name": "Consultar Producto",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-API-KEY", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrlProductos}}/productos/1"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Inventario",
+      "item": [
+        {
+          "name": "Crear Inventario",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "Content-Type", "value": "application/json" },
+              { "key": "X-API-KEY", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrlInventario}}/inventario",
+            "body": {
+              "mode": "raw",
+              "raw": "{ \"productoId\": 1, \"cantidad\": 20 }"
+            }
+          }
+        },
+        {
+          "name": "Listar Inventario",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-API-KEY", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrlInventario}}/inventario"
+          }
+        },
+        {
+          "name": "Consultar Cantidad Producto",
+          "request": {
+            "method": "GET",
+            "header": [
+              { "key": "X-API-KEY", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrlInventario}}/inventario/producto/1"
+          }
+        },
+        {
+          "name": "Actualizar Cantidad",
+          "request": {
+            "method": "PUT",
+            "header": [
+              { "key": "X-API-KEY", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrlInventario}}/inventario/1?cantidad=10"
+          }
+        },
+        {
+          "name": "Registrar Compra",
+          "request": {
+            "method": "POST",
+            "header": [
+              { "key": "X-API-KEY", "value": "{{apiKey}}" }
+            ],
+            "url": "{{baseUrlInventario}}/inventario/compra?productoId=1&cantidad=5"
+          }
+        }
+      ]
+    }
+  ]
+}
+
+
+
+//entorno de variables
+// nombre del archivo para crear y importar en el postman --->  microservicios.postman_environment.json
+
+//codigo
+
+{
+  "id": "microservicios-env",
+  "name": "Microservicios Environment",
+  "values": [
+    {
+      "key": "baseUrlProductos",
+      "value": "http://localhost:8081",
+      "enabled": true
+    },
+    {
+      "key": "baseUrlInventario",
+      "value": "http://localhost:8082",
+      "enabled": true
+    },
+    {
+      "key": "apiKey",
+      "value": "MI_API_KEY_SECRETA",
+      "enabled": true
+    }
+  ],
+  "_postman_variable_scope": "environment",
+  "_postman_exported_at": "2026-01-29T12:05:00.000Z",
+  "_postman_exported_using": "Postman/10.0.0"
+}
