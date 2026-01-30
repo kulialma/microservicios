@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  productos:
+    build: ./micro_productos
+    ports:
+      - "8081:8081"
+    container_name: micro_productos
+
+  inventario:
+    build: ./micro_inventario
+    ports:
+      - "8082:8082"
+    container_name: micro_inventario
