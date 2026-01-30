@@ -1,63 +1,100 @@
-Proyecto de Microservicios
+# 📦 Proyecto de Microservicios con Spring Boot y Docker Compose
 
-Este repositorio contiene dos microservicios desarrollados con Spring Boot:
+Este proyecto contiene dos microservicios independientes (**micro_productos** y **micro_inventario**) desarrollados con **Spring Boot 3.5.10**, empaquetados con **Maven 3.6.3** y ejecutados en contenedores Docker.  
+La ejecución se realiza en **Ubuntu/WSL2** utilizando **Docker Engine 29.2.0** y **Docker Compose v5.0.2**.
 
-micro_productos: Gestión de productos.
+---
 
-micro_inventario: Gestión de inventario y compras.
+## 🚀 Requisitos previos
 
-Requisitos
+- **Ubuntu/WSL2** configurado correctamente.
+- **Java 17 (OpenJDK 17.0.17)** instalado:
+  ```bash
+  sudo apt update
+  sudo apt install -y openjdk-17-jdk
+Maven 3.6.3 instalado:
 
-Java 17 (versión recomendada: 17.0.17)
+bash
+sudo apt install -y maven
+Docker Engine 29.2.0 y Docker Compose v5.0.2 instalados.
 
-Maven 3.9.x (versión recomendada: 3.9.6)
+Verificar versiones:
 
-Git 2.x (versión recomendada: 2.44 o superior)
-
-Clonar el repositorio
-
-git clone https://github.com/kulialma/microservicios.git
- cd mi-proyecto-microservicios
-
-Arrancar los microservicios
-
-Microservicio Productos
-
+bash
+java -version
+javac -version
+mvn -v
+docker --version
+docker compose version
+📂 Estructura del proyecto
+Código
+mi-proyecto-microservicios/
+├── micro_productos/
+│   ├── pom.xml
+│   ├── Dockerfile
+│   └── src/...
+├── micro_inventario/
+│   ├── pom.xml
+│   ├── Dockerfile
+│   └── src/...
+├── README.md
+├── DOCUMENTACION.md
+└── docker-compose.yml
+🛠️ Compilación de los microservicios
+Productos
+bash
 cd micro_productos
- mvn spring-boot:run
+mvn clean package
+Inventario
+bash
+cd ../micro_inventario
+mvn clean package
+👉 Esto genera los .jar en la carpeta target/.
 
-Microservicio Inventario
+🐳 Dockerfile de cada microservicio
+micro_productos
+dockerfile
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY target/*.jar app.jar
+EXPOSE 8081
+ENTRYPOINT ["java","-jar","app.jar"]
+micro_inventario
+dockerfile
+FROM eclipse-temurin:17-jdk
+WORKDIR /app
+COPY target/*.jar app.jar
+EXPOSE 8082
+ENTRYPOINT ["java","-jar","app.jar"]
+⚙️ Archivo docker-compose.yml
+Ubicado en la raíz del proyecto:
 
-cd micro_inventario
- mvn spring-boot:run
+yaml
+services:
+  productos:
+    build: ./micro_productos
+    ports:
+      - "8081:8081"
+    container_name: micro_productos
 
-Ejecutar pruebas
+  inventario:
+    build: ./micro_inventario
+    ports:
+      - "8082:8082"
+    container_name: micro_inventario
+▶️ Levantar los microservicios
+Desde la raíz del proyecto:
 
-Microservicio Productos
+bash
+docker compose up --build
+👉 Esto construye las imágenes y arranca ambos contenedores.
 
-cd micro_productos
- mvn test
+✅ Verificación
+Productos: http://localhost:8081/productos/public
 
-Microservicio Inventario
+Inventario: http://localhost:8082/inventario
 
-cd micro_inventario
- mvn test
+Prueba con curl:
 
-Ejecutar verificación
-
-Microservicio Productos
-
-cd micro_productos
- mvn verify
-
-Microservicio Inventario
-
-cd micro_inventario
- mvn verify
-
-Reportes de cobertura
-
-Después de ejecutar mvn verify, se generan los reportes de Jacoco en:
-
-micro_productos/target/site/jacoco/index.html
- micro_inventario/target/site/jacoco/index.html
+bash
+curl http
